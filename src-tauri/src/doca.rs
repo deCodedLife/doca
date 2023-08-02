@@ -6,10 +6,14 @@ use futures_util::StreamExt;
 use tokio;
 use reqwest::Error;
 
+use crate::configs;
+
 const API_URL: &str = "https://dev.docacrm.com";
 
-pub fn init() {
-    tokio::spawn( async { request_transactions().await } );
+pub fn init(cfg: &configs::Config) {
+    let api_url = cfg.api_url.to_string();
+    let cashbox = cfg.cashbox_id.to_string();
+    tokio::spawn( async { request_transactions(api_url, cashbox).await } );
 }
 
 fn parse_request(req: Value) {
@@ -39,18 +43,20 @@ pub async fn doca_post(object: &str, command: &str, data: Value) -> Result<(), E
 pub async fn change_status(sale_id: i8) {
     let mut body = json!({});
     body[ "sale_id" ] = Value::from(sale_id);
-    doca_post("atol", "confirm-transaction", body);
+    doca_post("atol", "confirm-transaction", body).await.unwrap();
 }
 
-pub async fn request_transactions() -> Result<(), Error> {
+pub async fn request_transactions(api_url: String, cashbox: String) -> Result<(), Error> {
     let mut stream = reqwest::Client::new()
-        .post(API_URL)
+        .post(api_url)
         .header("Content-Type", "application/json")
         .header( "Accept", "text/stream" )
         .json(&json!({
-            "object": "dev",
-            "command": "any",
-            "data": {}
+            "object": "atol",
+            "command": "get-operations",
+            "data": {
+                "cashbox_id": cashbox
+            }
         }))
         .send()
         .await

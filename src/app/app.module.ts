@@ -2,24 +2,14 @@ import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 
 import { AppComponent } from "./app.component";
-import {BackgroundService} from "./services/background.service";
-import {HttpClientModule} from "@angular/common/http";
+import { MainService } from "./services/main.service";
 
-import { appWindow } from "@tauri-apps/api/window";
 
-document.addEventListener("fullscreenchange", () => {
-    if (document.fullscreenElement) {
-        appWindow.setFullscreen(true);
-    } else {
-        appWindow.setFullscreen(false);
-    }
-});
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
-      BrowserModule,
-      HttpClientModule
+      BrowserModule
   ],
   providers: [],
   bootstrap: [AppComponent],
@@ -27,8 +17,7 @@ document.addEventListener("fullscreenchange", () => {
 
 export class AppModule {
   constructor(
-      private background: BackgroundService
+      private main: MainService
   ) {
-      // appWindow.setFullscreen( true )
   }
 }

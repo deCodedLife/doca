@@ -4,3 +4,18 @@ iframe {
   height: 100%;
   position: absolute;
 }
+
+.above {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: end;
+  pointer-events: none;
+}
+
+.above p {
+  padding: 0 30px;
+  margin: 10px 0;
+  color: rgba(255, 255, 255, 0.6);
+}

@@ -1,4 +1,8 @@
 <iframe
-  src="https://dev.docacrm.ru"
+  *ngIf="main.app_url.length != 0"
+  [src]="main.safe_url"
   allowfullscreen
 ></iframe>
+<div class="above">
+  <p>{{ main.app_url }}</p>
+</div>
