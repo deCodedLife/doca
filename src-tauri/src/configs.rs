@@ -1,24 +1,6 @@
 use std::io::Write;
 
-
-const CONFIGS_FILE: &str = "configs.json";
-const AUTOSTART_MAC: &str = " \n\
-<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n\
-<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"> \n\
-<plist version=\"1.0\"> \n\
-  <dict> \n\
-    <key>Label</key> \n\
-    <string>org.oxbox.docacrm</string> \n\
-    <key>ProgramArguments</key> \n\
-    <array> \n\
-       <string>/Applications/DocaCRM.app/Contents/MacOS/DocaCRM</string> \n\
-    </array> \n\
-    <key>RunAtLoad</key> \n\
-    <true/> \n\
-  </dict> \n\
-</plist>";
-const AUTOSTART_WIN: &str = r#"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"#;
-
+static CONFIGS_FILE: &str = "configs.json";
 
 // App configuration.
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
@@ -51,25 +33,6 @@ fn get_default() -> Config {
         autorun: false
     }
 }
-
-
-#[cfg(target_os = "windows")]
-pub fn add_to_autostart(path: String) {
-
-}
-
-#[cfg(target_os = "macos")]
-pub fn add_to_autostart() -> std::io::Result<()> {
-    let file = std::fs::File::create("~/Library/LaunchAgents/org.oxbox.docacrm.plist");
-    file.unwrap().write_all(AUTOSTART_MAC.as_bytes())?;
-    Ok(())
-}
-
-#[cfg(target_os = "macos")]
-pub fn remove_from_autostart() -> std::io::Result<()> {
-    std::fs::remove_file("~/Library/LaunchAgents/org/oxbox.oxbox.docacrm.plist")
-}
-
 
 fn write_config(conf: Config, path: String) -> std::io::Result<()> {
     let file = std::fs::File::create(path)?;

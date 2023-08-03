@@ -5,6 +5,7 @@ pub mod doca;
 pub mod ui;
 mod atol;
 mod configs;
+mod autostart;
 
 use sysinfo::SystemExt;
 use tauri::{CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent, Manager};
@@ -20,6 +21,19 @@ fn app_exit() {
     std::process::exit(-1);
 }
 
+fn autostart(cfg: &configs::Config) {
+    let is_configured = autostart::is_configured().unwrap_or(false);
+    if cfg.autorun && !is_configured {
+        autostart::add_to_autostart()
+            .expect("[-] Can't add to autostart ");
+    }
+    if !cfg.autorun && is_configured {
+        autostart::remove_from_autostart()
+            .expect("[-] Can't remove from autostart ");
+    }
+}
+
+
 #[tokio::main]
 async fn main() {
     doca_exists()
@@ -28,11 +42,11 @@ async fn main() {
     let cfg = configs::get_config();
     doca::init(&cfg);
 
-    if cfg.autorun {
-        configs::add_to_autostart().expect_err("[-] Can't add to autostart");
-    } else {
-        configs::remove_from_autostart().expect_err("[-] Can't remove from autostart");
-    }
+    #[cfg(target_os = "windows")]
+    autostart(&cfg);
+
+    #[cfg(target_os = "macos")]
+    autostart(&cfg);
 
     let restore = CustomMenuItem::new("restore".to_string(), "Развернуть");
     let exit = CustomMenuItem::new("exit".to_string(), "Завершить");
